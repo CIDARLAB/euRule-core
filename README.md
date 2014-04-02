@@ -1,4 +1,4 @@
 euRule-core
 ===========
 
-build your own rule predicates based on the miniEugene rules including the power of regular expressions (Finch)
+Build your own composite rule predicates using miniEugene rules and the power of regular expressions.
