@@ -51,6 +51,9 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eurule.parser;
 
+import org.cidarlab.eurule.PredicateRepository;
+import org.cidarlab.eurule.dom.CompositePredicate;
+
 import org.cidarlab.minieugene.Interp;
 import org.cidarlab.minieugene.symbol.*;
 import org.cidarlab.minieugene.predicates.*;
@@ -64,13 +67,18 @@ import org.apache.commons.lang3.ArrayUtils;
 // INTERPRETER
 private Interp interp;
 
+// PREDICATE REPOSITORY
+private PredicateRepository pr;
+
 // SYMBOL TABLES
 private SymbolTables symbols;
 public void init(SymbolTables symbols) {
     this.symbols = symbols;
+
+    this.pr = new PredicateRepository();
 }
 
-// N
+// N ... maximum length of the design
 private int N;
 
 // PREDICATES
@@ -85,6 +93,13 @@ public LogicalAnd getPredicate() {
     return this.la;
 }
 
+public int getN() {
+   return this.N;
+}
+
+public PredicateRepository getPredicateRepository() {
+    return this.pr;
+}
 
 // for tokenization
 String[] tokens = null;
@@ -102,17 +117,45 @@ private void addToken(String token) {
  	
 eurule 
 	throws EugeneException
-	:	(composite_constraint)+
+	:	size (composite_constraint)+
 	;
 
+size 	:	'N' '=' n=INT '.' {
+this.N = Integer.parseInt($n.text);
+this.interp = new Interp(this.symbols, this.N);
+	}
+	;
+	
 composite_constraint
 	throws EugeneException
-	:	ID ( '(' list_of_parameters ')' )? ':=' composite_constraint_block '.'
+	:	name=ID ( '(' list_of_parameters ')' )? ':=' ccb=composite_constraint_block {
+// put the composite predicate 
+// into the predicate repository
+this.pr.put(
+    new CompositePredicate($name.text, $ccb.lst));
+
+	}	'.'
 	;
+	catch[EugeneException e] {
+throw new EugeneException("line "+$name.line+" => "+e.getMessage());	
+	}
 
 composite_constraint_block
+	returns [List<Predicate> lst]
 	throws EugeneException
-	:	or_constraint (',' composite_constraint_block)?
+@init{
+$lst = new ArrayList<Predicate>();
+}	
+	:	oc=or_constraint {
+if($oc.lst.size() == 1) {
+    // ``store'' the predicate
+    $lst.add($oc.lst.get(0));   
+} else {
+    $lst.add(new LogicalOr($oc.lst));   
+}	
+	}	(',' ccb=composite_constraint_block {
+$lst.addAll($ccb.lst);	
+	})?
 	;	
 	
 or_constraint 

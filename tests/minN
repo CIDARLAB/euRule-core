@@ -1,0 +1,51 @@
+N = 5.
+
+// minN -> 1
+rule1 :=
+	contains a \/ not contains b.
+
+
+// minN -> 1 
+rule2 :=
+	contains a \/ contains b \/ contains c.
+
+
+// minN -> 2 
+rule3 :=
+	contains a,
+	contains b.
+	
+
+// minN -> 2 
+rule4 :=
+	contains a,
+	contains b \/ contains c.
+
+// minN -> 3 
+rule5 :=
+	all_forward,
+	contains a,
+	contains b \/ contains c,
+	contains d.
+
+// minN -> 4 
+rule6 :=
+	a EXACTLY 4,
+	contains b.
+
+// minN -> 3 
+rule7 :=
+	contains b,
+	a EXACTLY 4 \/ a EXACTLY 3.
+	
+// minN -> 1
+rule8 :=
+	a EXACTLY 5 \/ CONTAINS a.
+
+// minN => 2
+rule9 :=
+	all_forward,
+	contains b,
+	a exactly 4 or a exactly 2.		
+	
+	

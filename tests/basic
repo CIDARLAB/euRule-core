@@ -1,3 +1,5 @@
+N=5.
+
 myrule :=
 	contains a or contains b.
 
@@ -10,5 +12,3 @@ myrule :=
 	contains b,
 	contains c or contains d.
 	
-// INVALID ONES	
-myrule := .			

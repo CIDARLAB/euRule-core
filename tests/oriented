@@ -1,0 +1,13 @@
+N=2.
+
+oriented :=
+    contains p,
+    contains c,
+    
+	// forward p => p before c
+	// <=>
+	not forward p \/ p before c,
+	
+	// reverse p => p after c
+	// <=>
+	not reverse p \/ p after c.

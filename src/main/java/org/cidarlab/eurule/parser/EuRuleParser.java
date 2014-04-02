@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g 2014-04-02 12:30:12
+// $ANTLR 3.4 /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g 2014-04-02 13:59:20
 
 /*
 Copyright (c) 2012 Boston University.
@@ -24,6 +24,9 @@ ENHANCEMENTS, OR MODIFICATIONS.
 
 package org.cidarlab.eurule.parser;
 
+import org.cidarlab.eurule.PredicateRepository;
+import org.cidarlab.eurule.dom.CompositePredicate;
+
 import org.cidarlab.minieugene.Interp;
 import org.cidarlab.minieugene.symbol.*;
 import org.cidarlab.minieugene.predicates.*;
@@ -40,7 +43,7 @@ import java.util.ArrayList;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class EuRuleParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "CHAR", "COMMENT", "ESC_SEQ", "EXPONENT", "HEX_DIGIT", "ID", "INT", "OCTAL_ESC", "STRING", "UNICODE_ESC", "WS", "'('", "')'", "','", "'.'", "':='", "'AFTER'", "'ALL_AFTER'", "'ALL_BEFORE'", "'ALL_FORWARD'", "'ALL_NEXTTO'", "'ALL_REVERSE'", "'ALL_SAME_ORIENTATION'", "'ALTERNATE_ORIENTATION'", "'ALWAYS_NEXTTO'", "'BEFORE'", "'CONTAINS'", "'DRIVES'", "'ENDSWITH'", "'EQUALS'", "'EXACTLY'", "'FORWARD'", "'INDUCES'", "'MATCHES'", "'MORETHAN'", "'NEXTTO'", "'NOT'", "'NOTCONTAINS'", "'NOTEQUALS'", "'NOTEXACTLY'", "'NOTMATCHES'", "'NOTMORETHAN'", "'NOTTHEN'", "'NOTWITH'", "'OR'", "'REPRESSES'", "'REVERSE'", "'SAME_COUNT'", "'SAME_ORIENTATION'", "'SOME_AFTER'", "'SOME_BEFORE'", "'SOME_FORWARD'", "'SOME_NEXTTO'", "'SOME_REVERSE'", "'SOME_SAME_ORIENTATION'", "'STARTSWITH'", "'THEN'", "'WITH'", "'['", "'\\\\/'", "']'", "'after'", "'all_after'", "'all_before'", "'all_forward'", "'all_nextto'", "'all_reverse'", "'all_same_orientation'", "'alternate_orientation'", "'always_nextto'", "'before'", "'contains'", "'drives'", "'endswith'", "'equals'", "'exactly'", "'forward'", "'induces'", "'matches'", "'morethan'", "'nextto'", "'notcontains'", "'notequals'", "'notexactly'", "'notmatches'", "'notmorethan'", "'notthen'", "'notwith'", "'or'", "'represses'", "'reverse'", "'same_count'", "'same_orientation'", "'some_after'", "'some_before'", "'some_forward'", "'some_nextto'", "'some_reverse'", "'some_same_orientation'", "'startswith'", "'then'", "'with'", "'||'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "CHAR", "COMMENT", "ESC_SEQ", "EXPONENT", "HEX_DIGIT", "ID", "INT", "OCTAL_ESC", "STRING", "UNICODE_ESC", "WS", "'('", "')'", "','", "'.'", "':='", "'='", "'AFTER'", "'ALL_AFTER'", "'ALL_BEFORE'", "'ALL_FORWARD'", "'ALL_NEXTTO'", "'ALL_REVERSE'", "'ALL_SAME_ORIENTATION'", "'ALTERNATE_ORIENTATION'", "'ALWAYS_NEXTTO'", "'BEFORE'", "'CONTAINS'", "'DRIVES'", "'ENDSWITH'", "'EQUALS'", "'EXACTLY'", "'FORWARD'", "'INDUCES'", "'MATCHES'", "'MORETHAN'", "'N'", "'NEXTTO'", "'NOT'", "'NOTCONTAINS'", "'NOTEQUALS'", "'NOTEXACTLY'", "'NOTMATCHES'", "'NOTMORETHAN'", "'NOTTHEN'", "'NOTWITH'", "'OR'", "'REPRESSES'", "'REVERSE'", "'SAME_COUNT'", "'SAME_ORIENTATION'", "'SOME_AFTER'", "'SOME_BEFORE'", "'SOME_FORWARD'", "'SOME_NEXTTO'", "'SOME_REVERSE'", "'SOME_SAME_ORIENTATION'", "'STARTSWITH'", "'THEN'", "'WITH'", "'['", "'\\\\/'", "']'", "'after'", "'all_after'", "'all_before'", "'all_forward'", "'all_nextto'", "'all_reverse'", "'all_same_orientation'", "'alternate_orientation'", "'always_nextto'", "'before'", "'contains'", "'drives'", "'endswith'", "'equals'", "'exactly'", "'forward'", "'induces'", "'matches'", "'morethan'", "'nextto'", "'notcontains'", "'notequals'", "'notexactly'", "'notmatches'", "'notmorethan'", "'notthen'", "'notwith'", "'or'", "'represses'", "'reverse'", "'same_count'", "'same_orientation'", "'some_after'", "'some_before'", "'some_forward'", "'some_nextto'", "'some_reverse'", "'some_same_orientation'", "'startswith'", "'then'", "'with'", "'||'"
     };
 
     public static final int EOF=-1;
@@ -136,6 +139,8 @@ public class EuRuleParser extends Parser {
     public static final int T__104=104;
     public static final int T__105=105;
     public static final int T__106=106;
+    public static final int T__107=107;
+    public static final int T__108=108;
     public static final int CHAR=4;
     public static final int COMMENT=5;
     public static final int ESC_SEQ=6;
@@ -171,13 +176,18 @@ public class EuRuleParser extends Parser {
     // INTERPRETER
     private Interp interp;
 
+    // PREDICATE REPOSITORY
+    private PredicateRepository pr;
+
     // SYMBOL TABLES
     private SymbolTables symbols;
     public void init(SymbolTables symbols) {
         this.symbols = symbols;
+
+        this.pr = new PredicateRepository();
     }
 
-    // N
+    // N ... maximum length of the design
     private int N;
 
     // PREDICATES
@@ -192,6 +202,13 @@ public class EuRuleParser extends Parser {
         return this.la;
     }
 
+    public int getN() {
+       return this.N;
+    }
+
+    public PredicateRepository getPredicateRepository() {
+        return this.pr;
+    }
 
     // for tokenization
     String[] tokens = null;
@@ -208,13 +225,19 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "eurule"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:103:1: eurule : ( composite_constraint )+ ;
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:118:1: eurule : size ( composite_constraint )+ ;
     public final void eurule() throws EugeneException, RecognitionException {
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:105:2: ( ( composite_constraint )+ )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:105:4: ( composite_constraint )+
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:120:2: ( size ( composite_constraint )+ )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:120:4: size ( composite_constraint )+
             {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:105:4: ( composite_constraint )+
+            pushFollow(FOLLOW_size_in_eurule44);
+            size();
+
+            state._fsp--;
+
+
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:120:9: ( composite_constraint )+
             int cnt1=0;
             loop1:
             do {
@@ -228,9 +251,9 @@ public class EuRuleParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:105:5: composite_constraint
+            	    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:120:10: composite_constraint
             	    {
-            	    pushFollow(FOLLOW_composite_constraint_in_eurule45);
+            	    pushFollow(FOLLOW_composite_constraint_in_eurule47);
             	    composite_constraint();
 
             	    state._fsp--;
@@ -266,16 +289,59 @@ public class EuRuleParser extends Parser {
 
 
 
-    // $ANTLR start "composite_constraint"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:108:1: composite_constraint : ID ( '(' list_of_parameters ')' )? ':=' composite_constraint_block '.' ;
-    public final void composite_constraint() throws EugeneException, RecognitionException {
-        try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:110:2: ( ID ( '(' list_of_parameters ')' )? ':=' composite_constraint_block '.' )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:110:4: ID ( '(' list_of_parameters ')' )? ':=' composite_constraint_block '.'
-            {
-            match(input,ID,FOLLOW_ID_in_composite_constraint63); 
+    // $ANTLR start "size"
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:123:1: size : 'N' '=' n= INT '.' ;
+    public final void size() throws RecognitionException {
+        Token n=null;
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:110:7: ( '(' list_of_parameters ')' )?
+        try {
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:123:7: ( 'N' '=' n= INT '.' )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:123:9: 'N' '=' n= INT '.'
+            {
+            match(input,40,FOLLOW_40_in_size60); 
+
+            match(input,20,FOLLOW_20_in_size62); 
+
+            n=(Token)match(input,INT,FOLLOW_INT_in_size66); 
+
+            match(input,18,FOLLOW_18_in_size68); 
+
+
+            this.N = Integer.parseInt((n!=null?n.getText():null));
+            this.interp = new Interp(this.symbols, this.N);
+            	
+
+            }
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+        }
+
+        finally {
+        	// do for sure before leaving
+        }
+        return ;
+    }
+    // $ANTLR end "size"
+
+
+
+    // $ANTLR start "composite_constraint"
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:129:1: composite_constraint : name= ID ( '(' list_of_parameters ')' )? ':=' ccb= composite_constraint_block '.' ;
+    public final void composite_constraint() throws EugeneException, RecognitionException {
+        Token name=null;
+        List<Predicate> ccb =null;
+
+
+        try {
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:131:2: (name= ID ( '(' list_of_parameters ')' )? ':=' ccb= composite_constraint_block '.' )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:131:4: name= ID ( '(' list_of_parameters ')' )? ':=' ccb= composite_constraint_block '.'
+            {
+            name=(Token)match(input,ID,FOLLOW_ID_in_composite_constraint89); 
+
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:131:12: ( '(' list_of_parameters ')' )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -284,17 +350,17 @@ public class EuRuleParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:110:9: '(' list_of_parameters ')'
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:131:14: '(' list_of_parameters ')'
                     {
-                    match(input,15,FOLLOW_15_in_composite_constraint67); 
+                    match(input,15,FOLLOW_15_in_composite_constraint93); 
 
-                    pushFollow(FOLLOW_list_of_parameters_in_composite_constraint69);
+                    pushFollow(FOLLOW_list_of_parameters_in_composite_constraint95);
                     list_of_parameters();
 
                     state._fsp--;
 
 
-                    match(input,16,FOLLOW_16_in_composite_constraint71); 
+                    match(input,16,FOLLOW_16_in_composite_constraint97); 
 
                     }
                     break;
@@ -302,22 +368,31 @@ public class EuRuleParser extends Parser {
             }
 
 
-            match(input,19,FOLLOW_19_in_composite_constraint76); 
+            match(input,19,FOLLOW_19_in_composite_constraint102); 
 
-            pushFollow(FOLLOW_composite_constraint_block_in_composite_constraint78);
-            composite_constraint_block();
+            pushFollow(FOLLOW_composite_constraint_block_in_composite_constraint106);
+            ccb=composite_constraint_block();
 
             state._fsp--;
 
 
-            match(input,18,FOLLOW_18_in_composite_constraint80); 
+
+            // put the composite predicate 
+            // into the predicate repository
+            this.pr.put(
+                new CompositePredicate((name!=null?name.getText():null), ccb));
+
+            	
+
+            match(input,18,FOLLOW_18_in_composite_constraint110); 
 
             }
 
         }
-        catch (RecognitionException re) {
-            reportError(re);
-            recover(input,re);
+        catch (EugeneException e) {
+
+            throw new EugeneException("line "+(name!=null?name.getLine():0)+" => "+e.getMessage());	
+            	
         }
 
         finally {
@@ -330,19 +405,39 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "composite_constraint_block"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:113:1: composite_constraint_block : or_constraint ( ',' composite_constraint_block )? ;
-    public final void composite_constraint_block() throws EugeneException, RecognitionException {
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:143:1: composite_constraint_block returns [List<Predicate> lst] : oc= or_constraint ( ',' ccb= composite_constraint_block )? ;
+    public final List<Predicate> composite_constraint_block() throws EugeneException, RecognitionException {
+        List<Predicate> lst = null;
+
+
+        List<Predicate> oc =null;
+
+        List<Predicate> ccb =null;
+
+
+
+        lst = new ArrayList<Predicate>();
+
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:115:2: ( or_constraint ( ',' composite_constraint_block )? )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:115:4: or_constraint ( ',' composite_constraint_block )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:149:2: (oc= or_constraint ( ',' ccb= composite_constraint_block )? )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:149:4: oc= or_constraint ( ',' ccb= composite_constraint_block )?
             {
-            pushFollow(FOLLOW_or_constraint_in_composite_constraint_block96);
-            or_constraint();
+            pushFollow(FOLLOW_or_constraint_in_composite_constraint_block144);
+            oc=or_constraint();
 
             state._fsp--;
 
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:115:18: ( ',' composite_constraint_block )?
+
+            if(oc.size() == 1) {
+                // ``store'' the predicate
+                lst.add(oc.get(0));   
+            } else {
+                lst.add(new LogicalOr(oc));   
+            }	
+            	
+
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:156:4: ( ',' ccb= composite_constraint_block )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -351,15 +446,19 @@ public class EuRuleParser extends Parser {
             }
             switch (alt3) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:115:19: ',' composite_constraint_block
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:156:5: ',' ccb= composite_constraint_block
                     {
-                    match(input,17,FOLLOW_17_in_composite_constraint_block99); 
+                    match(input,17,FOLLOW_17_in_composite_constraint_block149); 
 
-                    pushFollow(FOLLOW_composite_constraint_block_in_composite_constraint_block101);
-                    composite_constraint_block();
+                    pushFollow(FOLLOW_composite_constraint_block_in_composite_constraint_block153);
+                    ccb=composite_constraint_block();
 
                     state._fsp--;
 
+
+
+                    lst.addAll(ccb);	
+                    	
 
                     }
                     break;
@@ -378,14 +477,14 @@ public class EuRuleParser extends Parser {
         finally {
         	// do for sure before leaving
         }
-        return ;
+        return lst;
     }
     // $ANTLR end "composite_constraint_block"
 
 
 
     // $ANTLR start "or_constraint"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:118:1: or_constraint returns [List<Predicate> lst] : c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )? ;
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:161:1: or_constraint returns [List<Predicate> lst] : c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )? ;
     public final List<Predicate> or_constraint() throws EugeneException, RecognitionException {
         List<Predicate> lst = null;
 
@@ -399,10 +498,10 @@ public class EuRuleParser extends Parser {
         lst = new ArrayList<Predicate>();
 
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:124:2: (c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )? )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:124:4: c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:167:2: (c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )? )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:167:4: c= constraint ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )?
             {
-            pushFollow(FOLLOW_constraint_in_or_constraint141);
+            pushFollow(FOLLOW_constraint_in_or_constraint195);
             c=constraint();
 
             state._fsp--;
@@ -412,18 +511,18 @@ public class EuRuleParser extends Parser {
             lst.add(c);
             	
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:126:4: ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:169:4: ( ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
-            if ( (LA4_0==48||LA4_0==63||LA4_0==92||LA4_0==106) ) {
+            if ( (LA4_0==50||LA4_0==65||LA4_0==94||LA4_0==108) ) {
                 alt4=1;
             }
             switch (alt4) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:126:5: ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:169:5: ( 'OR' | '\\\\/' | 'or' | '||' ) o= or_constraint
                     {
-                    if ( input.LA(1)==48||input.LA(1)==63||input.LA(1)==92||input.LA(1)==106 ) {
+                    if ( input.LA(1)==50||input.LA(1)==65||input.LA(1)==94||input.LA(1)==108 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -433,7 +532,7 @@ public class EuRuleParser extends Parser {
                     }
 
 
-                    pushFollow(FOLLOW_or_constraint_in_or_constraint158);
+                    pushFollow(FOLLOW_or_constraint_in_or_constraint212);
                     o=or_constraint();
 
                     state._fsp--;
@@ -467,7 +566,7 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "constraint"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:131:1: constraint returns [Predicate p] : (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )? ;
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:174:1: constraint returns [Predicate p] : (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )? ;
     public final Predicate constraint() throws EugeneException, RecognitionException {
         Predicate p = null;
 
@@ -481,21 +580,21 @@ public class EuRuleParser extends Parser {
 
 
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:134:2: ( (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )? )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:134:4: (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:177:2: ( (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )? )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:177:4: (not= 'NOT' )? (lhs= operand )? op= operator (rhs= operand )?
             {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:134:4: (not= 'NOT' )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:177:4: (not= 'NOT' )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
-            if ( (LA5_0==40) ) {
+            if ( (LA5_0==42) ) {
                 alt5=1;
             }
             switch (alt5) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:134:5: not= 'NOT'
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:177:5: not= 'NOT'
                     {
-                    not=(Token)match(input,40,FOLLOW_40_in_constraint194); 
+                    not=(Token)match(input,42,FOLLOW_42_in_constraint248); 
 
 
                     addToken("NOT");
@@ -507,7 +606,7 @@ public class EuRuleParser extends Parser {
             }
 
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:136:6: (lhs= operand )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:179:6: (lhs= operand )?
             int alt6=2;
             switch ( input.LA(1) ) {
                 case ID:
@@ -520,14 +619,14 @@ public class EuRuleParser extends Parser {
                     alt6=1;
                     }
                     break;
-                case 62:
+                case 64:
                     {
                     int LA6_3 = input.LA(2);
 
                     if ( (LA6_3==INT) ) {
                         int LA6_5 = input.LA(3);
 
-                        if ( (LA6_5==64) ) {
+                        if ( (LA6_5==66) ) {
                             alt6=1;
                         }
                     }
@@ -537,9 +636,9 @@ public class EuRuleParser extends Parser {
 
             switch (alt6) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:136:7: lhs= operand
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:179:7: lhs= operand
                     {
-                    pushFollow(FOLLOW_operand_in_constraint203);
+                    pushFollow(FOLLOW_operand_in_constraint257);
                     lhs=operand();
 
                     state._fsp--;
@@ -555,7 +654,7 @@ public class EuRuleParser extends Parser {
             }
 
 
-            pushFollow(FOLLOW_operator_in_constraint211);
+            pushFollow(FOLLOW_operator_in_constraint265);
             op=operator();
 
             state._fsp--;
@@ -565,18 +664,18 @@ public class EuRuleParser extends Parser {
             addToken((op!=null?input.toString(op.start,op.stop):null));	
             	
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:140:4: (rhs= operand )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:183:4: (rhs= operand )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
-            if ( ((LA7_0 >= ID && LA7_0 <= INT)||LA7_0==62) ) {
+            if ( ((LA7_0 >= ID && LA7_0 <= INT)||LA7_0==64) ) {
                 alt7=1;
             }
             switch (alt7) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:140:5: rhs= operand
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:183:5: rhs= operand
                     {
-                    pushFollow(FOLLOW_operand_in_constraint218);
+                    pushFollow(FOLLOW_operand_in_constraint272);
                     rhs=operand();
 
                     state._fsp--;
@@ -623,265 +722,265 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "operator"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:155:1: operator : (| ( 'CONTAINS' | 'contains' ) | ( 'NOTCONTAINS' | 'notcontains' ) | ( 'EXACTLY' | 'exactly' ) | ( 'NOTEXACTLY' | 'notexactly' ) | ( 'MORETHAN' | 'morethan' ) | ( 'NOTMORETHAN' | 'notmorethan' ) | ( 'SAME_COUNT' | 'same_count' ) | ( 'WITH' | 'with' ) | ( 'NOTWITH' | 'notwith' ) | ( 'THEN' | 'then' ) | ( 'NOTTHEN' | 'notthen' ) | ( 'STARTSWITH' | 'startswith' ) | ( 'ENDSWITH' | 'endswith' ) | ( 'BEFORE' | 'before' ) | ( 'ALL_BEFORE' | 'all_before' ) | ( 'SOME_BEFORE' | 'some_before' ) | ( 'AFTER' | 'after' ) | ( 'ALL_AFTER' | 'all_after' ) | ( 'SOME_AFTER' | 'some_after' ) | ( 'NEXTTO' | 'nextto' ) | ( 'ALL_NEXTTO' | 'all_nextto' ) | ( 'SOME_NEXTTO' | 'some_nextto' ) | ( 'ALWAYS_NEXTTO' | 'always_nextto' ) | ( 'EQUALS' | 'equals' ) | ( 'NOTEQUALS' | 'notequals' ) | ( 'MATCHES' | 'matches' ) | ( 'NOTMATCHES' | 'notmatches' ) | ( 'FORWARD' | 'forward' ) | ( 'ALL_FORWARD' | 'all_forward' ) | ( 'SOME_FORWARD' | 'some_forward' ) | ( 'REVERSE' | 'reverse' ) | ( 'ALL_REVERSE' | 'all_reverse' ) | ( 'SOME_REVERSE' | 'some_reverse' ) | ( 'SAME_ORIENTATION' | 'same_orientation' ) | ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' ) | ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' ) | ( 'REPRESSES' | 'represses' ) | ( 'INDUCES' | 'induces' ) | ( 'DRIVES' | 'drives' ) | ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' ) );
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:198:1: operator : (| ( 'CONTAINS' | 'contains' ) | ( 'NOTCONTAINS' | 'notcontains' ) | ( 'EXACTLY' | 'exactly' ) | ( 'NOTEXACTLY' | 'notexactly' ) | ( 'MORETHAN' | 'morethan' ) | ( 'NOTMORETHAN' | 'notmorethan' ) | ( 'SAME_COUNT' | 'same_count' ) | ( 'WITH' | 'with' ) | ( 'NOTWITH' | 'notwith' ) | ( 'THEN' | 'then' ) | ( 'NOTTHEN' | 'notthen' ) | ( 'STARTSWITH' | 'startswith' ) | ( 'ENDSWITH' | 'endswith' ) | ( 'BEFORE' | 'before' ) | ( 'ALL_BEFORE' | 'all_before' ) | ( 'SOME_BEFORE' | 'some_before' ) | ( 'AFTER' | 'after' ) | ( 'ALL_AFTER' | 'all_after' ) | ( 'SOME_AFTER' | 'some_after' ) | ( 'NEXTTO' | 'nextto' ) | ( 'ALL_NEXTTO' | 'all_nextto' ) | ( 'SOME_NEXTTO' | 'some_nextto' ) | ( 'ALWAYS_NEXTTO' | 'always_nextto' ) | ( 'EQUALS' | 'equals' ) | ( 'NOTEQUALS' | 'notequals' ) | ( 'MATCHES' | 'matches' ) | ( 'NOTMATCHES' | 'notmatches' ) | ( 'FORWARD' | 'forward' ) | ( 'ALL_FORWARD' | 'all_forward' ) | ( 'SOME_FORWARD' | 'some_forward' ) | ( 'REVERSE' | 'reverse' ) | ( 'ALL_REVERSE' | 'all_reverse' ) | ( 'SOME_REVERSE' | 'some_reverse' ) | ( 'SAME_ORIENTATION' | 'same_orientation' ) | ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' ) | ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' ) | ( 'REPRESSES' | 'represses' ) | ( 'INDUCES' | 'induces' ) | ( 'DRIVES' | 'drives' ) | ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' ) );
     public final EuRuleParser.operator_return operator() throws RecognitionException {
         EuRuleParser.operator_return retval = new EuRuleParser.operator_return();
         retval.start = input.LT(1);
 
 
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:155:9: (| ( 'CONTAINS' | 'contains' ) | ( 'NOTCONTAINS' | 'notcontains' ) | ( 'EXACTLY' | 'exactly' ) | ( 'NOTEXACTLY' | 'notexactly' ) | ( 'MORETHAN' | 'morethan' ) | ( 'NOTMORETHAN' | 'notmorethan' ) | ( 'SAME_COUNT' | 'same_count' ) | ( 'WITH' | 'with' ) | ( 'NOTWITH' | 'notwith' ) | ( 'THEN' | 'then' ) | ( 'NOTTHEN' | 'notthen' ) | ( 'STARTSWITH' | 'startswith' ) | ( 'ENDSWITH' | 'endswith' ) | ( 'BEFORE' | 'before' ) | ( 'ALL_BEFORE' | 'all_before' ) | ( 'SOME_BEFORE' | 'some_before' ) | ( 'AFTER' | 'after' ) | ( 'ALL_AFTER' | 'all_after' ) | ( 'SOME_AFTER' | 'some_after' ) | ( 'NEXTTO' | 'nextto' ) | ( 'ALL_NEXTTO' | 'all_nextto' ) | ( 'SOME_NEXTTO' | 'some_nextto' ) | ( 'ALWAYS_NEXTTO' | 'always_nextto' ) | ( 'EQUALS' | 'equals' ) | ( 'NOTEQUALS' | 'notequals' ) | ( 'MATCHES' | 'matches' ) | ( 'NOTMATCHES' | 'notmatches' ) | ( 'FORWARD' | 'forward' ) | ( 'ALL_FORWARD' | 'all_forward' ) | ( 'SOME_FORWARD' | 'some_forward' ) | ( 'REVERSE' | 'reverse' ) | ( 'ALL_REVERSE' | 'all_reverse' ) | ( 'SOME_REVERSE' | 'some_reverse' ) | ( 'SAME_ORIENTATION' | 'same_orientation' ) | ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' ) | ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' ) | ( 'REPRESSES' | 'represses' ) | ( 'INDUCES' | 'induces' ) | ( 'DRIVES' | 'drives' ) | ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' ) )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:198:9: (| ( 'CONTAINS' | 'contains' ) | ( 'NOTCONTAINS' | 'notcontains' ) | ( 'EXACTLY' | 'exactly' ) | ( 'NOTEXACTLY' | 'notexactly' ) | ( 'MORETHAN' | 'morethan' ) | ( 'NOTMORETHAN' | 'notmorethan' ) | ( 'SAME_COUNT' | 'same_count' ) | ( 'WITH' | 'with' ) | ( 'NOTWITH' | 'notwith' ) | ( 'THEN' | 'then' ) | ( 'NOTTHEN' | 'notthen' ) | ( 'STARTSWITH' | 'startswith' ) | ( 'ENDSWITH' | 'endswith' ) | ( 'BEFORE' | 'before' ) | ( 'ALL_BEFORE' | 'all_before' ) | ( 'SOME_BEFORE' | 'some_before' ) | ( 'AFTER' | 'after' ) | ( 'ALL_AFTER' | 'all_after' ) | ( 'SOME_AFTER' | 'some_after' ) | ( 'NEXTTO' | 'nextto' ) | ( 'ALL_NEXTTO' | 'all_nextto' ) | ( 'SOME_NEXTTO' | 'some_nextto' ) | ( 'ALWAYS_NEXTTO' | 'always_nextto' ) | ( 'EQUALS' | 'equals' ) | ( 'NOTEQUALS' | 'notequals' ) | ( 'MATCHES' | 'matches' ) | ( 'NOTMATCHES' | 'notmatches' ) | ( 'FORWARD' | 'forward' ) | ( 'ALL_FORWARD' | 'all_forward' ) | ( 'SOME_FORWARD' | 'some_forward' ) | ( 'REVERSE' | 'reverse' ) | ( 'ALL_REVERSE' | 'all_reverse' ) | ( 'SOME_REVERSE' | 'some_reverse' ) | ( 'SAME_ORIENTATION' | 'same_orientation' ) | ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' ) | ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' ) | ( 'REPRESSES' | 'represses' ) | ( 'INDUCES' | 'induces' ) | ( 'DRIVES' | 'drives' ) | ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' ) )
             int alt8=41;
             switch ( input.LA(1) ) {
             case ID:
             case INT:
             case 17:
             case 18:
-            case 48:
-            case 62:
-            case 63:
-            case 92:
-            case 106:
+            case 50:
+            case 64:
+            case 65:
+            case 94:
+            case 108:
                 {
                 alt8=1;
                 }
                 break;
-            case 30:
-            case 75:
+            case 31:
+            case 77:
                 {
                 alt8=2;
-                }
-                break;
-            case 41:
-            case 85:
-                {
-                alt8=3;
-                }
-                break;
-            case 34:
-            case 79:
-                {
-                alt8=4;
                 }
                 break;
             case 43:
             case 87:
                 {
-                alt8=5;
+                alt8=3;
                 }
                 break;
-            case 38:
-            case 83:
+            case 35:
+            case 81:
                 {
-                alt8=6;
+                alt8=4;
                 }
                 break;
             case 45:
             case 89:
                 {
-                alt8=7;
+                alt8=5;
                 }
                 break;
-            case 51:
-            case 95:
+            case 39:
+            case 85:
                 {
-                alt8=8;
-                }
-                break;
-            case 61:
-            case 105:
-                {
-                alt8=9;
+                alt8=6;
                 }
                 break;
             case 47:
             case 91:
                 {
-                alt8=10;
-                }
-                break;
-            case 60:
-            case 104:
-                {
-                alt8=11;
-                }
-                break;
-            case 46:
-            case 90:
-                {
-                alt8=12;
-                }
-                break;
-            case 59:
-            case 103:
-                {
-                alt8=13;
-                }
-                break;
-            case 32:
-            case 77:
-                {
-                alt8=14;
-                }
-                break;
-            case 29:
-            case 74:
-                {
-                alt8=15;
-                }
-                break;
-            case 22:
-            case 67:
-                {
-                alt8=16;
-                }
-                break;
-            case 54:
-            case 98:
-                {
-                alt8=17;
-                }
-                break;
-            case 20:
-            case 65:
-                {
-                alt8=18;
-                }
-                break;
-            case 21:
-            case 66:
-                {
-                alt8=19;
+                alt8=7;
                 }
                 break;
             case 53:
             case 97:
                 {
-                alt8=20;
+                alt8=8;
                 }
                 break;
-            case 39:
-            case 84:
+            case 63:
+            case 107:
                 {
-                alt8=21;
-                }
-                break;
-            case 24:
-            case 69:
-                {
-                alt8=22;
-                }
-                break;
-            case 56:
-            case 100:
-                {
-                alt8=23;
-                }
-                break;
-            case 28:
-            case 73:
-                {
-                alt8=24;
-                }
-                break;
-            case 33:
-            case 78:
-                {
-                alt8=25;
-                }
-                break;
-            case 42:
-            case 86:
-                {
-                alt8=26;
-                }
-                break;
-            case 37:
-            case 82:
-                {
-                alt8=27;
-                }
-                break;
-            case 44:
-            case 88:
-                {
-                alt8=28;
-                }
-                break;
-            case 35:
-            case 80:
-                {
-                alt8=29;
-                }
-                break;
-            case 23:
-            case 68:
-                {
-                alt8=30;
-                }
-                break;
-            case 55:
-            case 99:
-                {
-                alt8=31;
-                }
-                break;
-            case 50:
-            case 94:
-                {
-                alt8=32;
-                }
-                break;
-            case 25:
-            case 70:
-                {
-                alt8=33;
-                }
-                break;
-            case 57:
-            case 101:
-                {
-                alt8=34;
-                }
-                break;
-            case 52:
-            case 96:
-                {
-                alt8=35;
-                }
-                break;
-            case 26:
-            case 71:
-                {
-                alt8=36;
-                }
-                break;
-            case 58:
-            case 102:
-                {
-                alt8=37;
+                alt8=9;
                 }
                 break;
             case 49:
             case 93:
                 {
-                alt8=38;
+                alt8=10;
+                }
+                break;
+            case 62:
+            case 106:
+                {
+                alt8=11;
+                }
+                break;
+            case 48:
+            case 92:
+                {
+                alt8=12;
+                }
+                break;
+            case 61:
+            case 105:
+                {
+                alt8=13;
+                }
+                break;
+            case 33:
+            case 79:
+                {
+                alt8=14;
+                }
+                break;
+            case 30:
+            case 76:
+                {
+                alt8=15;
+                }
+                break;
+            case 23:
+            case 69:
+                {
+                alt8=16;
+                }
+                break;
+            case 56:
+            case 100:
+                {
+                alt8=17;
+                }
+                break;
+            case 21:
+            case 67:
+                {
+                alt8=18;
+                }
+                break;
+            case 22:
+            case 68:
+                {
+                alt8=19;
+                }
+                break;
+            case 55:
+            case 99:
+                {
+                alt8=20;
+                }
+                break;
+            case 41:
+            case 86:
+                {
+                alt8=21;
+                }
+                break;
+            case 25:
+            case 71:
+                {
+                alt8=22;
+                }
+                break;
+            case 58:
+            case 102:
+                {
+                alt8=23;
+                }
+                break;
+            case 29:
+            case 75:
+                {
+                alt8=24;
+                }
+                break;
+            case 34:
+            case 80:
+                {
+                alt8=25;
+                }
+                break;
+            case 44:
+            case 88:
+                {
+                alt8=26;
+                }
+                break;
+            case 38:
+            case 84:
+                {
+                alt8=27;
+                }
+                break;
+            case 46:
+            case 90:
+                {
+                alt8=28;
                 }
                 break;
             case 36:
-            case 81:
+            case 82:
+                {
+                alt8=29;
+                }
+                break;
+            case 24:
+            case 70:
+                {
+                alt8=30;
+                }
+                break;
+            case 57:
+            case 101:
+                {
+                alt8=31;
+                }
+                break;
+            case 52:
+            case 96:
+                {
+                alt8=32;
+                }
+                break;
+            case 26:
+            case 72:
+                {
+                alt8=33;
+                }
+                break;
+            case 59:
+            case 103:
+                {
+                alt8=34;
+                }
+                break;
+            case 54:
+            case 98:
+                {
+                alt8=35;
+                }
+                break;
+            case 27:
+            case 73:
+                {
+                alt8=36;
+                }
+                break;
+            case 60:
+            case 104:
+                {
+                alt8=37;
+                }
+                break;
+            case 51:
+            case 95:
+                {
+                alt8=38;
+                }
+                break;
+            case 37:
+            case 83:
                 {
                 alt8=39;
                 }
                 break;
-            case 31:
-            case 76:
+            case 32:
+            case 78:
                 {
                 alt8=40;
                 }
                 break;
-            case 27:
-            case 72:
+            case 28:
+            case 74:
                 {
                 alt8=41;
                 }
@@ -896,14 +995,14 @@ public class EuRuleParser extends Parser {
 
             switch (alt8) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:156:2: 
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:199:2: 
                     {
                     }
                     break;
                 case 2 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:156:4: ( 'CONTAINS' | 'contains' )
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:199:4: ( 'CONTAINS' | 'contains' )
                     {
-                    if ( input.LA(1)==30||input.LA(1)==75 ) {
+                    if ( input.LA(1)==31||input.LA(1)==77 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -916,37 +1015,7 @@ public class EuRuleParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:157:4: ( 'NOTCONTAINS' | 'notcontains' )
-                    {
-                    if ( input.LA(1)==41||input.LA(1)==85 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 4 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:158:4: ( 'EXACTLY' | 'exactly' )
-                    {
-                    if ( input.LA(1)==34||input.LA(1)==79 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 5 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:159:4: ( 'NOTEXACTLY' | 'notexactly' )
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:200:4: ( 'NOTCONTAINS' | 'notcontains' )
                     {
                     if ( input.LA(1)==43||input.LA(1)==87 ) {
                         input.consume();
@@ -960,10 +1029,10 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 6 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:160:4: ( 'MORETHAN' | 'morethan' )
+                case 4 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:201:4: ( 'EXACTLY' | 'exactly' )
                     {
-                    if ( input.LA(1)==38||input.LA(1)==83 ) {
+                    if ( input.LA(1)==35||input.LA(1)==81 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -975,8 +1044,8 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 7 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:161:4: ( 'NOTMORETHAN' | 'notmorethan' )
+                case 5 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:202:4: ( 'NOTEXACTLY' | 'notexactly' )
                     {
                     if ( input.LA(1)==45||input.LA(1)==89 ) {
                         input.consume();
@@ -990,10 +1059,10 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 8 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:162:4: ( 'SAME_COUNT' | 'same_count' )
+                case 6 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:203:4: ( 'MORETHAN' | 'morethan' )
                     {
-                    if ( input.LA(1)==51||input.LA(1)==95 ) {
+                    if ( input.LA(1)==39||input.LA(1)==85 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -1005,23 +1074,8 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 9 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:163:4: ( 'WITH' | 'with' )
-                    {
-                    if ( input.LA(1)==61||input.LA(1)==105 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 10 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:164:4: ( 'NOTWITH' | 'notwith' )
+                case 7 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:204:4: ( 'NOTMORETHAN' | 'notmorethan' )
                     {
                     if ( input.LA(1)==47||input.LA(1)==91 ) {
                         input.consume();
@@ -1035,143 +1089,8 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 11 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:165:4: ( 'THEN' | 'then' )
-                    {
-                    if ( input.LA(1)==60||input.LA(1)==104 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 12 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:166:4: ( 'NOTTHEN' | 'notthen' )
-                    {
-                    if ( input.LA(1)==46||input.LA(1)==90 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 13 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:167:4: ( 'STARTSWITH' | 'startswith' )
-                    {
-                    if ( input.LA(1)==59||input.LA(1)==103 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 14 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:168:4: ( 'ENDSWITH' | 'endswith' )
-                    {
-                    if ( input.LA(1)==32||input.LA(1)==77 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 15 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:169:4: ( 'BEFORE' | 'before' )
-                    {
-                    if ( input.LA(1)==29||input.LA(1)==74 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 16 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:170:4: ( 'ALL_BEFORE' | 'all_before' )
-                    {
-                    if ( input.LA(1)==22||input.LA(1)==67 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 17 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:171:4: ( 'SOME_BEFORE' | 'some_before' )
-                    {
-                    if ( input.LA(1)==54||input.LA(1)==98 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 18 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:172:4: ( 'AFTER' | 'after' )
-                    {
-                    if ( input.LA(1)==20||input.LA(1)==65 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 19 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:173:4: ( 'ALL_AFTER' | 'all_after' )
-                    {
-                    if ( input.LA(1)==21||input.LA(1)==66 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 20 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:174:4: ( 'SOME_AFTER' | 'some_after' )
+                case 8 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:205:4: ( 'SAME_COUNT' | 'same_count' )
                     {
                     if ( input.LA(1)==53||input.LA(1)==97 ) {
                         input.consume();
@@ -1185,10 +1104,10 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 21 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:175:4: ( 'NEXTTO' | 'nextto' )
+                case 9 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:206:4: ( 'WITH' | 'with' )
                     {
-                    if ( input.LA(1)==39||input.LA(1)==84 ) {
+                    if ( input.LA(1)==63||input.LA(1)==107 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -1200,248 +1119,8 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 22 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:176:4: ( 'ALL_NEXTTO' | 'all_nextto' )
-                    {
-                    if ( input.LA(1)==24||input.LA(1)==69 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 23 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:177:4: ( 'SOME_NEXTTO' | 'some_nextto' )
-                    {
-                    if ( input.LA(1)==56||input.LA(1)==100 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 24 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:178:4: ( 'ALWAYS_NEXTTO' | 'always_nextto' )
-                    {
-                    if ( input.LA(1)==28||input.LA(1)==73 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 25 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:179:4: ( 'EQUALS' | 'equals' )
-                    {
-                    if ( input.LA(1)==33||input.LA(1)==78 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 26 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:180:4: ( 'NOTEQUALS' | 'notequals' )
-                    {
-                    if ( input.LA(1)==42||input.LA(1)==86 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 27 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:181:4: ( 'MATCHES' | 'matches' )
-                    {
-                    if ( input.LA(1)==37||input.LA(1)==82 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 28 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:182:4: ( 'NOTMATCHES' | 'notmatches' )
-                    {
-                    if ( input.LA(1)==44||input.LA(1)==88 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 29 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:183:4: ( 'FORWARD' | 'forward' )
-                    {
-                    if ( input.LA(1)==35||input.LA(1)==80 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 30 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:184:4: ( 'ALL_FORWARD' | 'all_forward' )
-                    {
-                    if ( input.LA(1)==23||input.LA(1)==68 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 31 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:185:4: ( 'SOME_FORWARD' | 'some_forward' )
-                    {
-                    if ( input.LA(1)==55||input.LA(1)==99 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 32 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:186:4: ( 'REVERSE' | 'reverse' )
-                    {
-                    if ( input.LA(1)==50||input.LA(1)==94 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 33 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:187:4: ( 'ALL_REVERSE' | 'all_reverse' )
-                    {
-                    if ( input.LA(1)==25||input.LA(1)==70 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 34 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:188:4: ( 'SOME_REVERSE' | 'some_reverse' )
-                    {
-                    if ( input.LA(1)==57||input.LA(1)==101 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 35 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:189:4: ( 'SAME_ORIENTATION' | 'same_orientation' )
-                    {
-                    if ( input.LA(1)==52||input.LA(1)==96 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 36 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:190:4: ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' )
-                    {
-                    if ( input.LA(1)==26||input.LA(1)==71 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 37 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:191:4: ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' )
-                    {
-                    if ( input.LA(1)==58||input.LA(1)==102 ) {
-                        input.consume();
-                        state.errorRecovery=false;
-                    }
-                    else {
-                        MismatchedSetException mse = new MismatchedSetException(null,input);
-                        throw mse;
-                    }
-
-
-                    }
-                    break;
-                case 38 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:192:4: ( 'REPRESSES' | 'represses' )
+                case 10 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:207:4: ( 'NOTWITH' | 'notwith' )
                     {
                     if ( input.LA(1)==49||input.LA(1)==93 ) {
                         input.consume();
@@ -1455,10 +1134,430 @@ public class EuRuleParser extends Parser {
 
                     }
                     break;
-                case 39 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:193:4: ( 'INDUCES' | 'induces' )
+                case 11 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:208:4: ( 'THEN' | 'then' )
                     {
-                    if ( input.LA(1)==36||input.LA(1)==81 ) {
+                    if ( input.LA(1)==62||input.LA(1)==106 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 12 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:209:4: ( 'NOTTHEN' | 'notthen' )
+                    {
+                    if ( input.LA(1)==48||input.LA(1)==92 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 13 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:210:4: ( 'STARTSWITH' | 'startswith' )
+                    {
+                    if ( input.LA(1)==61||input.LA(1)==105 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 14 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:211:4: ( 'ENDSWITH' | 'endswith' )
+                    {
+                    if ( input.LA(1)==33||input.LA(1)==79 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 15 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:212:4: ( 'BEFORE' | 'before' )
+                    {
+                    if ( input.LA(1)==30||input.LA(1)==76 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 16 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:213:4: ( 'ALL_BEFORE' | 'all_before' )
+                    {
+                    if ( input.LA(1)==23||input.LA(1)==69 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 17 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:214:4: ( 'SOME_BEFORE' | 'some_before' )
+                    {
+                    if ( input.LA(1)==56||input.LA(1)==100 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 18 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:215:4: ( 'AFTER' | 'after' )
+                    {
+                    if ( input.LA(1)==21||input.LA(1)==67 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 19 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:216:4: ( 'ALL_AFTER' | 'all_after' )
+                    {
+                    if ( input.LA(1)==22||input.LA(1)==68 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 20 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:217:4: ( 'SOME_AFTER' | 'some_after' )
+                    {
+                    if ( input.LA(1)==55||input.LA(1)==99 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 21 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:218:4: ( 'NEXTTO' | 'nextto' )
+                    {
+                    if ( input.LA(1)==41||input.LA(1)==86 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 22 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:219:4: ( 'ALL_NEXTTO' | 'all_nextto' )
+                    {
+                    if ( input.LA(1)==25||input.LA(1)==71 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 23 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:220:4: ( 'SOME_NEXTTO' | 'some_nextto' )
+                    {
+                    if ( input.LA(1)==58||input.LA(1)==102 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 24 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:221:4: ( 'ALWAYS_NEXTTO' | 'always_nextto' )
+                    {
+                    if ( input.LA(1)==29||input.LA(1)==75 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 25 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:222:4: ( 'EQUALS' | 'equals' )
+                    {
+                    if ( input.LA(1)==34||input.LA(1)==80 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 26 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:223:4: ( 'NOTEQUALS' | 'notequals' )
+                    {
+                    if ( input.LA(1)==44||input.LA(1)==88 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 27 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:224:4: ( 'MATCHES' | 'matches' )
+                    {
+                    if ( input.LA(1)==38||input.LA(1)==84 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 28 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:225:4: ( 'NOTMATCHES' | 'notmatches' )
+                    {
+                    if ( input.LA(1)==46||input.LA(1)==90 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 29 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:226:4: ( 'FORWARD' | 'forward' )
+                    {
+                    if ( input.LA(1)==36||input.LA(1)==82 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 30 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:227:4: ( 'ALL_FORWARD' | 'all_forward' )
+                    {
+                    if ( input.LA(1)==24||input.LA(1)==70 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 31 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:228:4: ( 'SOME_FORWARD' | 'some_forward' )
+                    {
+                    if ( input.LA(1)==57||input.LA(1)==101 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 32 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:229:4: ( 'REVERSE' | 'reverse' )
+                    {
+                    if ( input.LA(1)==52||input.LA(1)==96 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 33 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:230:4: ( 'ALL_REVERSE' | 'all_reverse' )
+                    {
+                    if ( input.LA(1)==26||input.LA(1)==72 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 34 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:231:4: ( 'SOME_REVERSE' | 'some_reverse' )
+                    {
+                    if ( input.LA(1)==59||input.LA(1)==103 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 35 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:232:4: ( 'SAME_ORIENTATION' | 'same_orientation' )
+                    {
+                    if ( input.LA(1)==54||input.LA(1)==98 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 36 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:233:4: ( 'ALL_SAME_ORIENTATION' | 'all_same_orientation' )
+                    {
+                    if ( input.LA(1)==27||input.LA(1)==73 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 37 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:234:4: ( 'SOME_SAME_ORIENTATION' | 'some_same_orientation' )
+                    {
+                    if ( input.LA(1)==60||input.LA(1)==104 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 38 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:235:4: ( 'REPRESSES' | 'represses' )
+                    {
+                    if ( input.LA(1)==51||input.LA(1)==95 ) {
+                        input.consume();
+                        state.errorRecovery=false;
+                    }
+                    else {
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        throw mse;
+                    }
+
+
+                    }
+                    break;
+                case 39 :
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:236:4: ( 'INDUCES' | 'induces' )
+                    {
+                    if ( input.LA(1)==37||input.LA(1)==83 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -1471,9 +1570,9 @@ public class EuRuleParser extends Parser {
                     }
                     break;
                 case 40 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:194:4: ( 'DRIVES' | 'drives' )
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:237:4: ( 'DRIVES' | 'drives' )
                     {
-                    if ( input.LA(1)==31||input.LA(1)==76 ) {
+                    if ( input.LA(1)==32||input.LA(1)==78 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -1486,9 +1585,9 @@ public class EuRuleParser extends Parser {
                     }
                     break;
                 case 41 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:195:4: ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' )
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:238:4: ( 'ALTERNATE_ORIENTATION' | 'alternate_orientation' )
                     {
-                    if ( input.LA(1)==27||input.LA(1)==72 ) {
+                    if ( input.LA(1)==28||input.LA(1)==74 ) {
                         input.consume();
                         state.errorRecovery=false;
                     }
@@ -1524,14 +1623,14 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "operand"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:198:1: operand : ( ID | INT | '[' INT ']' );
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:241:1: operand : ( ID | INT | '[' INT ']' );
     public final EuRuleParser.operand_return operand() throws RecognitionException {
         EuRuleParser.operand_return retval = new EuRuleParser.operand_return();
         retval.start = input.LT(1);
 
 
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:198:9: ( ID | INT | '[' INT ']' )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:241:9: ( ID | INT | '[' INT ']' )
             int alt9=3;
             switch ( input.LA(1) ) {
             case ID:
@@ -1544,7 +1643,7 @@ public class EuRuleParser extends Parser {
                 alt9=2;
                 }
                 break;
-            case 62:
+            case 64:
                 {
                 alt9=3;
                 }
@@ -1559,27 +1658,27 @@ public class EuRuleParser extends Parser {
 
             switch (alt9) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:198:11: ID
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:241:11: ID
                     {
-                    match(input,ID,FOLLOW_ID_in_operand610); 
+                    match(input,ID,FOLLOW_ID_in_operand664); 
 
                     }
                     break;
                 case 2 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:199:4: INT
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:242:4: INT
                     {
-                    match(input,INT,FOLLOW_INT_in_operand616); 
+                    match(input,INT,FOLLOW_INT_in_operand670); 
 
                     }
                     break;
                 case 3 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:200:4: '[' INT ']'
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:243:4: '[' INT ']'
                     {
-                    match(input,62,FOLLOW_62_in_operand621); 
+                    match(input,64,FOLLOW_64_in_operand675); 
 
-                    match(input,INT,FOLLOW_INT_in_operand623); 
+                    match(input,INT,FOLLOW_INT_in_operand677); 
 
-                    match(input,64,FOLLOW_64_in_operand625); 
+                    match(input,66,FOLLOW_66_in_operand679); 
 
                     }
                     break;
@@ -1604,15 +1703,15 @@ public class EuRuleParser extends Parser {
 
 
     // $ANTLR start "list_of_parameters"
-    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:203:1: list_of_parameters : ID ( ',' list_of_parameters )? ;
+    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:246:1: list_of_parameters : ID ( ',' list_of_parameters )? ;
     public final void list_of_parameters() throws RecognitionException {
         try {
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:204:2: ( ID ( ',' list_of_parameters )? )
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:204:4: ID ( ',' list_of_parameters )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:247:2: ( ID ( ',' list_of_parameters )? )
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:247:4: ID ( ',' list_of_parameters )?
             {
-            match(input,ID,FOLLOW_ID_in_list_of_parameters636); 
+            match(input,ID,FOLLOW_ID_in_list_of_parameters690); 
 
-            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:204:7: ( ',' list_of_parameters )?
+            // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:247:7: ( ',' list_of_parameters )?
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -1621,11 +1720,11 @@ public class EuRuleParser extends Parser {
             }
             switch (alt10) {
                 case 1 :
-                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:204:8: ',' list_of_parameters
+                    // /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g:247:8: ',' list_of_parameters
                     {
-                    match(input,17,FOLLOW_17_in_list_of_parameters639); 
+                    match(input,17,FOLLOW_17_in_list_of_parameters693); 
 
-                    pushFollow(FOLLOW_list_of_parameters_in_list_of_parameters641);
+                    pushFollow(FOLLOW_list_of_parameters_in_list_of_parameters695);
                     list_of_parameters();
 
                     state._fsp--;
@@ -1657,30 +1756,29 @@ public class EuRuleParser extends Parser {
 
  
 
-    public static final BitSet FOLLOW_composite_constraint_in_eurule45 = new BitSet(new long[]{0x0000000000000202L});
-    public static final BitSet FOLLOW_ID_in_composite_constraint63 = new BitSet(new long[]{0x0000000000088000L});
-    public static final BitSet FOLLOW_15_in_composite_constraint67 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_list_of_parameters_in_composite_constraint69 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_16_in_composite_constraint71 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_composite_constraint76 = new BitSet(new long[]{0x7FFEFFFFFFF00600L,0x000003FFEFFFFFFEL});
-    public static final BitSet FOLLOW_composite_constraint_block_in_composite_constraint78 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_18_in_composite_constraint80 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_or_constraint_in_composite_constraint_block96 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_17_in_composite_constraint_block99 = new BitSet(new long[]{0x7FFEFFFFFFF00600L,0x000003FFEFFFFFFEL});
-    public static final BitSet FOLLOW_composite_constraint_block_in_composite_constraint_block101 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_constraint_in_or_constraint141 = new BitSet(new long[]{0x8001000000000002L,0x0000040010000000L});
-    public static final BitSet FOLLOW_set_in_or_constraint146 = new BitSet(new long[]{0x7FFEFFFFFFF00600L,0x000003FFEFFFFFFEL});
-    public static final BitSet FOLLOW_or_constraint_in_or_constraint158 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_40_in_constraint194 = new BitSet(new long[]{0x7FFEFEFFFFF00600L,0x000003FFEFFFFFFEL});
-    public static final BitSet FOLLOW_operand_in_constraint203 = new BitSet(new long[]{0x7FFEFEFFFFF00600L,0x000003FFEFFFFFFEL});
-    public static final BitSet FOLLOW_operator_in_constraint211 = new BitSet(new long[]{0x4000000000000602L});
-    public static final BitSet FOLLOW_operand_in_constraint218 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator242 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator251 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator260 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator269 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator278 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_set_in_operator287 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_size_in_eurule44 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_composite_constraint_in_eurule47 = new BitSet(new long[]{0x0000000000000202L});
+    public static final BitSet FOLLOW_40_in_size60 = new BitSet(new long[]{0x0000000000100000L});
+    public static final BitSet FOLLOW_20_in_size62 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_INT_in_size66 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_18_in_size68 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_composite_constraint89 = new BitSet(new long[]{0x0000000000088000L});
+    public static final BitSet FOLLOW_15_in_composite_constraint93 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_list_of_parameters_in_composite_constraint95 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_16_in_composite_constraint97 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_19_in_composite_constraint102 = new BitSet(new long[]{0xFFFBFEFFFFE00600L,0x00000FFFBFFFFFF9L});
+    public static final BitSet FOLLOW_composite_constraint_block_in_composite_constraint106 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_18_in_composite_constraint110 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_or_constraint_in_composite_constraint_block144 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_17_in_composite_constraint_block149 = new BitSet(new long[]{0xFFFBFEFFFFE00600L,0x00000FFFBFFFFFF9L});
+    public static final BitSet FOLLOW_composite_constraint_block_in_composite_constraint_block153 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_constraint_in_or_constraint195 = new BitSet(new long[]{0x0004000000000002L,0x0000100040000002L});
+    public static final BitSet FOLLOW_set_in_or_constraint200 = new BitSet(new long[]{0xFFFBFEFFFFE00600L,0x00000FFFBFFFFFF9L});
+    public static final BitSet FOLLOW_or_constraint_in_or_constraint212 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_42_in_constraint248 = new BitSet(new long[]{0xFFFBFAFFFFE00600L,0x00000FFFBFFFFFF9L});
+    public static final BitSet FOLLOW_operand_in_constraint257 = new BitSet(new long[]{0xFFFBFAFFFFE00600L,0x00000FFFBFFFFFF9L});
+    public static final BitSet FOLLOW_operator_in_constraint265 = new BitSet(new long[]{0x0000000000000602L,0x0000000000000001L});
+    public static final BitSet FOLLOW_operand_in_constraint272 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_operator296 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_operator305 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_operator314 = new BitSet(new long[]{0x0000000000000002L});
@@ -1715,13 +1813,19 @@ public class EuRuleParser extends Parser {
     public static final BitSet FOLLOW_set_in_operator575 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_operator584 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_operator593 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_operand610 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INT_in_operand616 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_62_in_operand621 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_INT_in_operand623 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000001L});
-    public static final BitSet FOLLOW_64_in_operand625 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_list_of_parameters636 = new BitSet(new long[]{0x0000000000020002L});
-    public static final BitSet FOLLOW_17_in_list_of_parameters639 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_list_of_parameters_in_list_of_parameters641 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator602 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator611 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator620 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator629 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator638 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_set_in_operator647 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_operand664 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INT_in_operand670 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_64_in_operand675 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_INT_in_operand677 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000004L});
+    public static final BitSet FOLLOW_66_in_operand679 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_list_of_parameters690 = new BitSet(new long[]{0x0000000000020002L});
+    public static final BitSet FOLLOW_17_in_list_of_parameters693 = new BitSet(new long[]{0x0000000000000200L});
+    public static final BitSet FOLLOW_list_of_parameters_in_list_of_parameters695 = new BitSet(new long[]{0x0000000000000002L});
 
 }
