@@ -1,0 +1,14 @@
+myrule :=
+	contains a or contains b.
+
+myrule :=
+	contains a,
+	contains b.
+	
+myrule :=
+	contains a,
+	contains b,
+	contains c or contains d.
+	
+// INVALID ONES	
+myrule := .			
