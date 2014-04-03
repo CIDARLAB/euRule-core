@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g 2014-04-02 13:59:20
+// $ANTLR 3.4 /Users/ernstl/PostDoc/BU/Eugene/miniEugene/workspace/euRule-core/grammar/EuRule.g 2014-04-03 09:35:25
 
 /*
 Copyright (c) 2012 Boston University.
@@ -198,7 +198,7 @@ public class EuRuleParser extends Parser {
     }
 
     public LogicalAnd getPredicate() {
-        this.la.setN(this.N);
+        this.la.setMaxN(this.N);
         return this.la;
     }
 
@@ -308,7 +308,7 @@ public class EuRuleParser extends Parser {
 
 
             this.N = Integer.parseInt((n!=null?n.getText():null));
-            this.interp = new Interp(this.symbols, this.N);
+            this.interp = new Interp(this.symbols);
             	
 
             }

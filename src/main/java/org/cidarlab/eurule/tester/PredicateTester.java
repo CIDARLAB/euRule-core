@@ -26,26 +26,27 @@ public class PredicateTester {
 		 * calculate min. N 
 		 */
 		int minN = this.calculateMinN(cp.getPredicates());
-		System.out.println(cp.getName()+ " -> min. N: "+minN+" ... max. N: "+maxN);
+//		System.out.println(cp.getName()+ " -> min. N: "+minN+" ... max. N: "+maxN);
 
 		List<Component[]> solutions = new ArrayList<Component[]>();
-		if(minN <= maxN) {
+//		if(minN <= maxN) {
 			MiniEugene me = new MiniEugene();
 	
-			for(int i=minN; i<=maxN; i++) {
+			// for the time being, just take maxN			
+			//for(int i=minN; i<=maxN; i++) {
 				// build miniEugene script
-				String script = this.buildScript(cp.getPredicates(), i);
+				String script = this.buildScript(cp.getPredicates(), maxN);
 		
 				// solve the problem
 				me.solve(script);
 				
 				// keep track of the solutions
 				solutions.addAll(me.getSolutions());
-			}
+			//}
 			
 //			me.getStatistics().print();
 
-		}
+//		}
 		
 		return solutions;
 	}

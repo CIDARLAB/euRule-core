@@ -1,4 +1,4 @@
-N=2.
+N=10.
 
 oriented :=
     contains p,
@@ -8,6 +8,10 @@ oriented :=
 	// <=>
 	not forward p \/ p before c,
 	
+	not forward c \/ c after p,
+	
 	// reverse p => p after c
 	// <=>
-	not reverse p \/ p after c.
+	not reverse p \/ p after c,
+	
+	not reverse c \/ c before p.

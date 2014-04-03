@@ -1,5 +1,6 @@
 N = 5.
 
+/**
 // minN -> 1
 rule1 :=
 	contains a \/ not contains b.
@@ -47,5 +48,12 @@ rule9 :=
 	all_forward,
 	contains b,
 	a exactly 4 or a exactly 2.		
+*/
+
+// minN => 1	
+rule10 :=
+	contains a \/ contains b,
+	contains b \/ contains a.
+		
 	
 	

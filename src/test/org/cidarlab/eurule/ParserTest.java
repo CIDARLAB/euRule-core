@@ -21,8 +21,8 @@ public class ParserTest {
 		ParserTest pt = new ParserTest();
 		
 //		pt.test(FileUtil.readFile(new File("./tests/basic")));
-		pt.test(FileUtil.readFile(new File("./tests/minN")));
-//		pt.test(FileUtil.readFile(new File("./tests/oriented")));
+//		pt.test(FileUtil.readFile(new File("./tests/minN")));
+		pt.test(FileUtil.readFile(new File("./tests/oriented")));
 	}
 	
 	/**
